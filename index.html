@@ -26,6 +26,10 @@
 @media(max-width:900px){.hero{gap:26px}.quiz-layout{grid-template-columns:1fr}.question-card{padding:26px}}
 @media(max-width:620px){.wrap{padding:0 17px}.top{padding:16px 0}.brand{font-size:.88rem}.brand small{font-size:.57rem}.hero{grid-template-columns:1fr;gap:15px;padding:28px 0}.hero h1,.reader-intro h1,.large .hero h1{font-size:2.1rem}.hero-copy .scope-note{font-size:.79rem;margin-top:15px}.setup{padding:20px}.modules{grid-template-columns:1fr}.module{padding:15px 0}.question-card{padding:21px 17px}.question-card h2,.reading-question h3{font-size:1.12rem}.question-meta{flex-wrap:wrap}.option{font-size:.89rem;padding:12px 11px}.feedback{padding:15px}.score{align-items:flex-start;grid-row:auto}.result-header{gap:15px}.result-header h1{font-size:1.7rem}.reader-note{font-size:.84rem}.reading-nav .btn{font-size:.73rem}.large .brand small{display:none}}
 @media(max-width:360px){.hero h1,.reader-intro h1,.large .hero h1{font-size:1.85rem}.brand small{font-size:.53rem}.modes{grid-template-columns:1fr}}
+
+.timer-settings{margin-top:18px}.timer-settings p{font-size:.77rem;margin:8px 0 0}.quiz-status{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.timer{display:inline-flex;gap:8px;align-items:center;font-size:.83rem;color:var(--muted)}.timer b{font-variant-numeric:tabular-nums;color:var(--ink);font-size:1rem}.timer.time-low b{color:var(--red)}.resume .timer{margin-top:8px}.keyboard-hint{font-size:.74rem;color:var(--muted);margin:12px 0 0}.topic-retry{margin-top:15px}.needs-review{border-color:#bca98e}.repeat-plan{margin-top:24px;padding:19px 21px;background:#eeeee7;border-left:3px solid #a18148;border-radius:0 7px 7px 0}.repeat-plan h2{font-size:1.1rem;margin-bottom:9px}.repeat-plan p{margin:0 0 8px}.repeat-plan p:last-child{margin-bottom:0}.review-select{max-width:430px;margin-bottom:17px}.completion-note{font-size:.85rem;margin-top:8px!important}.num{min-height:42px}
+@media(hover:none){.keyboard-hint{display:none}}@media(max-width:620px){.quiz-top{align-items:flex-start}.quiz-status{gap:7px;flex-direction:column;align-items:flex-end}.repeat-plan{padding:16px}.result-modules{gap:10px}.num{min-height:40px}.result-module .btn{font-size:.76rem;padding:8px}}
+
 </style>
 </head>
 <body>
@@ -473,37 +477,158 @@ const $=s=>document.querySelector(s);
 const app=$('#app');
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const byId=id=>QUESTIONS.find(q=>q.id===id);
-let state=null,view='home',selected=null,onlyErrors=false,storageOk=true;
-try{const p=JSON.parse(localStorage.getItem(KEY)||'null');if(p&&p.version===VERSION&&['learn','exam'].includes(p.mode)&&['quiz','result'].includes(p.phase)&&Array.isArray(p.ids)&&p.ids.length>0&&p.ids.length<=20&&new Set(p.ids).size===p.ids.length&&p.ids.every(id=>byId(id))&&p.answers&&typeof p.answers==='object'&&Object.entries(p.answers).every(([id,v])=>p.ids.includes(Number(id))&&Number.isInteger(v)&&v>=0&&v<byId(Number(id)).options.length)&&Number.isInteger(p.index)&&p.index>=0&&p.index<p.ids.length&&p.options&&p.ids.every(id=>Array.isArray(p.options[id])&&p.options[id].length===byId(id).options.length&&new Set(p.options[id]).size===byId(id).options.length&&p.options[id].every(v=>Number.isInteger(v)&&v>=0&&v<byId(id).options.length))&&(p.phase!=='result'||p.ids.every(id=>p.answers[id]!==undefined)))state=p;}catch(e){storageOk=false}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){storageOk=false}}
-function say(t){$('#live').textContent=t}
-function focusTitle(){const h=app.querySelector('[data-focus]');if(h){h.focus({preventScroll:true});h.scrollIntoView({block:'start',behavior:'auto'})}}
-function shuffled(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function refs(q){return q.refs.map(r=>`<a href="${LAW+SOURCES[r.a].path}" target="_blank" rel="noopener noreferrer">67-ФЗ, ст. ${r.a}${r.p==='статья полностью'?'':', '+esc(r.p)}</a>`).join(' · ')}
-function home(){view='home';onlyErrors=false;app.innerHTML=`<section class="hero"><div class="hero-copy"><h1>Ситуационные задания</h1><p>20 вопросов по избирательному праву. В каждом — один правильный ответ.</p><p class="scope-note">Рассматриваются бумажные бюллетени и общий порядок, установленный Федеральным законом № 67-ФЗ. Особые условия указаны в самих заданиях.</p></div><section class="setup" aria-labelledby="setup-title"><h2 id="setup-title">Параметры теста</h2><fieldset class="modes"><legend class="sr-only">Режим прохождения</legend><label class="mode"><input type="radio" name="mode" value="learn" checked><span><b>С пояснениями</b><small>Разбор после каждого ответа</small></span></label><label class="mode"><input type="radio" name="mode" value="exam"><span><b>Проверка знаний</b><small>Разбор после завершения</small></span></label></fieldset><label class="label" for="scope">Раздел</label><select id="scope" class="select"><option value="all">Все разделы · 20 вопросов</option>${MODULES.map((m,i)=>`<option value="${i}">${esc(m.name)} · 5 вопросов</option>`).join('')}</select><label class="check"><input type="checkbox" id="shuffle" checked>Перемешать вопросы и ответы</label><button class="btn primary wide" id="start">Начать тест</button></section></section>${state?`<section class="resume"><p><b>${state.phase==='result'?'Сохраненный результат':'Незавершенная попытка'}</b><br><span class="small">${state.mode==='learn'?'С пояснениями':'Проверка знаний'} · ${Object.keys(state.answers).length} из ${state.ids.length}</span></p><button class="btn small" id="resume">${state.phase==='result'?'Посмотреть результат':'Продолжить'}</button></section>`:''}<section aria-labelledby="topics-title"><div class="section-title"><h2 id="topics-title">Разделы</h2></div><div class="modules">${MODULES.map((m,i)=>`<article class="module"><span class="number">${String(i+1).padStart(2,'0')}</span><div><h3>${esc(m.name)}</h3><p>${esc(m.desc)}</p></div></article>`).join('')}</div></section><details class="how"><summary>Порядок прохождения</summary><div><p>За правильный ответ — один балл. В режиме с пояснениями ответ фиксируется после проверки. В режиме проверки знаний его можно изменить до завершения теста.</p><p>Последняя попытка сохраняется в этом браузере, если доступно локальное хранилище. На странице результата можно повторить ошибки, распечатать разбор или сохранить его в текстовый файл.</p><p>Тест работает без интернета. Подключение требуется только для перехода к текстам закона. Если предпросмотр не запускает интерактивный режим, в файле доступна самопроверка с раскрывающимися ответами.</p></div></details>`;
-$('#start').onclick=()=>{const mode=$('input[name=mode]:checked').value;const scope=$('#scope').value;const mix=$('#shuffle').checked;const ids=QUESTIONS.filter(q=>scope==='all'||q.m===Number(scope)).map(q=>q.id);if(state&&state.phase==='quiz'&&!confirm('Начать новую попытку? Она заменит сохраненную незавершенную попытку.'))return;start(ids,mode,mix)};
-if($('#resume'))$('#resume').onclick=()=>{view=state.phase;selected=null;render();focusTitle()};}
-
-function start(ids,mode='learn',mix=false){const order=mix?shuffled(ids):[...ids];state={version:VERSION,phase:'quiz',mode,ids:order,index:0,answers:{},options:Object.fromEntries(order.map(id=>[id,mix?shuffled(byId(id).options.map((_,i)=>i)):byId(id).options.map((_,i)=>i)]))};selected=null;onlyErrors=false;view='quiz';save();render();focusTitle()}
-function quiz(){const q=byId(state.ids[state.index]);const answer=state.answers[q.id];const locked=state.mode==='learn'&&answer!==undefined;selected=answer===undefined?null:answer;const done=Object.keys(state.answers).length;const isLast=state.index===state.ids.length-1;app.innerHTML=`<div class="quiz-top"><button class="btn ghost small" id="back-home">← К разделам</button><span class="pill">${state.mode==='learn'?'С пояснениями':'Проверка знаний'}</span></div><div class="quiz-layout"><section class="question-card"><div class="question-meta"><span>СИТУАЦИЯ ${state.index+1} ИЗ ${state.ids.length}</span><span>${esc(MODULES[q.m].name)}</span></div><div class="progress" role="progressbar" aria-label="Ответы сохранены" aria-valuenow="${done}" aria-valuemin="0" aria-valuemax="${state.ids.length}"><span style="width:${done/state.ids.length*100}%"></span></div><p class="eyebrow">${esc(q.title)}</p><h2 id="question-text" tabindex="-1" data-focus>${esc(q.q)}</h2><fieldset class="options" aria-labelledby="question-text"><legend class="sr-only">Выберите один ответ</legend>${state.options[q.id].map((opt,i)=>`<label class="option ${locked?'locked':''} ${locked&&opt===q.correct?'right':''} ${locked&&opt===answer&&opt!==q.correct?'wrong':''}"><input type="radio" name="answer" value="${opt}" ${answer===opt?'checked':''} ${locked?'disabled':''}><span class="option-text"><span class="letter">${['А','Б','В','Г'][i]}.</span>${esc(q.options[opt])}${locked&&opt===q.correct?'<span class="answer-tag">✓ Правильный ответ</span>':''}${locked&&opt===answer&&opt!==q.correct?'<span class="answer-tag">× Ваш ответ</span>':''}</span></label>`).join('')}</fieldset>${locked?`<div class="feedback ${answer===q.correct?'':'error'}"><h3>${answer===q.correct?'Верно':'Неверно'}</h3><p>${esc(q.explain)}</p><p class="legal">${refs(q)}</p></div>`:''}<div class="actions"><button class="btn" id="previous" ${state.index===0?'disabled':''}>← Назад</button><button class="btn primary" id="submit" ${selected===null?'disabled':''}>${state.mode==='learn'&&!locked?'Проверить ответ':isLast?'Завершить тест':'Далее →'}</button></div><div id="question-notice" class="notice" hidden></div></section><aside class="side"><h3>Вопросы</h3><div class="numbers" aria-label="Навигация по вопросам">${state.ids.map((id,i)=>`<button class="num ${state.answers[id]!==undefined?'done':''} ${state.index===i?'current':''}" data-index="${i}" ${state.index===i?'aria-current="step"':''} aria-label="Вопрос ${i+1}${state.answers[id]!==undefined?', ответ сохранен':''}">${i+1}</button>`).join('')}</div><p class="answer-count">Отвечено: ${done} из ${state.ids.length}</p>${!storageOk?'<p class="storage-note">В этом браузере сохранение между открытиями недоступно. Текущая попытка работает до закрытия страницы.</p>':''}</aside></div>`;
-$('#back-home').onclick=home;$('#previous').onclick=()=>move(state.index-1);app.querySelectorAll('[data-index]').forEach(b=>b.onclick=()=>move(Number(b.dataset.index)));
-app.querySelectorAll('input[name=answer]').forEach(r=>r.onchange=()=>{selected=Number(r.value);$('#submit').disabled=false});
-$('#submit').onclick=()=>{if(selected===null)return;if(state.mode==='learn'&&!locked){state.answers[q.id]=selected;save();quiz();const feedback=app.querySelector('.feedback');feedback.setAttribute('tabindex','-1');feedback.focus({preventScroll:true});feedback.scrollIntoView({block:'nearest'});say(selected===q.correct?'Верно':'Неверно');return}state.answers[q.id]=selected;save();if(isLast)finish();else move(state.index+1)};}
-function move(index){if(state.mode==='exam'&&selected!==null)state.answers[state.ids[state.index]]=selected;state.index=index;save();quiz();focusTitle()}
-function finish(){const missing=state.ids.findIndex(id=>state.answers[id]===undefined);if(missing!==-1){move(missing);const n=$('#question-notice');n.hidden=false;n.textContent='Остался вопрос без ответа. Ответьте на все вопросы, чтобы получить итог.';say(n.textContent);return}state.phase='result';view='result';save();results();focusTitle()}
-function score(){return state.ids.filter(id=>state.answers[id]===byId(id).correct).length}
-function results(){view='result';const right=score(),total=state.ids.length,percent=Math.round(right/total*100);const wrong=state.ids.filter(id=>state.answers[id]!==byId(id).correct);const heading='Результат теста';const description=`Правильных ответов: ${right}. Ошибок: ${total-right}.`;
-app.innerHTML=`<section class="result-header"><div><span class="eyebrow">${state.mode==='learn'?'С пояснениями':'Проверка знаний'}</span><h1 tabindex="-1" data-focus>${heading}</h1><p>${description}</p></div><div class="score" aria-label="${right} правильных ответов из ${total}, ${percent} процентов"><strong>${right}/${total}</strong><span>${percent}% верных</span></div></section><div class="result-modules">${MODULES.map((m,i)=>{const ids=state.ids.filter(id=>byId(id).m===i);if(!ids.length)return '';const n=ids.filter(id=>state.answers[id]===byId(id).correct).length;return `<section class="result-module"><h3>${esc(m.name)}</h3><strong>${n} / ${ids.length}</strong><div class="progress" role="progressbar" aria-label="${esc(m.name)}: правильных ответов" aria-valuemin="0" aria-valuemax="${ids.length}" aria-valuenow="${n}"><span style="width:${n/ids.length*100}%"></span></div></section>`}).join('')}</div><div class="result-actions">${wrong.length?'<button class="btn primary" id="retry-errors">Повторить ошибки</button>':''}<button class="btn ${wrong.length?'':'primary'}" id="retry-all">Пройти еще раз</button><button class="btn" id="choose-route">Выбрать раздел</button><button class="btn" id="print">Печать разбора</button><button class="btn" id="download">Сохранить результат</button></div><section aria-labelledby="review-title"><div class="review-heading"><h2 id="review-title">Разбор ответов</h2><label class="check" style="margin:0"><input type="checkbox" id="errors-only" ${onlyErrors?'checked':''}>Только ошибки</label></div><div id="reviews">${reviewHtml(onlyErrors)}</div></section>`;
-if($('#retry-errors'))$('#retry-errors').onclick=()=>start(wrong,'learn',false);$('#retry-all').onclick=()=>start(state.ids,state.mode,false);$('#choose-route').onclick=home;$('#errors-only').onchange=e=>{onlyErrors=e.target.checked;$('#reviews').innerHTML=reviewHtml(onlyErrors)};$('#print').onclick=printResult;$('#download').onclick=downloadResult;}
-function reviewHtml(errorsOnly){const ids=state.ids.filter(id=>!errorsOnly||state.answers[id]!==byId(id).correct);if(!ids.length)return '<p class="notice">Ошибок нет.</p>';return ids.map(id=>{const q=byId(id),a=state.answers[id],ok=a===q.correct;return `<details class="review ${ok?'':'fail'}"><summary><span class="review-icon" aria-label="${ok?'Верно':'Ошибка'}">${ok?'✓':'×'}</span><span>${state.ids.indexOf(id)+1}. ${esc(q.title)}</span></summary><div class="review-body"><p><b>${esc(q.q)}</b></p><p class="selected-answer">Ваш ответ: ${esc(q.options[a])}</p>${ok?'':`<p><b>Правильный ответ:</b> ${esc(q.options[q.correct])}</p>`}<p>${esc(q.explain)}</p><div class="legal">${refs(q)}</div></div></details>`}).join('')}
-function printResult(){const right=score();$('#print-area').innerHTML=`<h1>Первое голосование</h1><p>Результат: ${right} из ${state.ids.length} (${Math.round(right/state.ids.length*100)}%). Режим: ${state.mode==='learn'?'с пояснениями':'проверка знаний'}.</p><p>Правовая основа: Федеральный закон от 12.06.2002 № 67-ФЗ.</p>${state.ids.map((id,i)=>{const q=byId(id);return `<article><h2>${i+1}. ${esc(q.title)}</h2><p>${esc(q.q)}</p><p>Ваш ответ: ${esc(q.options[state.answers[id]])}</p><p><b>Правильный ответ:</b> ${esc(q.options[q.correct])}</p><p>${esc(q.explain)}</p><p>${refs(q)}</p></article>`}).join('')}`;window.print()}
-function downloadResult(){const body=['ПЕРВОЕ ГОЛОСОВАНИЕ','Практикум по избирательному праву',`Результат: ${score()} из ${state.ids.length}`,`Режим: ${state.mode==='learn'?'с пояснениями':'проверка знаний'}`,'Правовая основа: Федеральный закон от 12.06.2002 № 67-ФЗ.','',...state.ids.flatMap((id,i)=>{const q=byId(id);return[`${i+1}. ${q.q}`,`Ваш ответ: ${q.options[state.answers[id]]}`,`Правильный ответ: ${q.options[q.correct]}`,q.explain,...q.refs.map(r=>`67-ФЗ, ст. ${r.a}, ${r.p}. ${LAW+SOURCES[r.a].path}`),'']})].join('\r\n');const url=URL.createObjectURL(new Blob(['\ufeff'+body],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Первое_голосование_результат.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-function render(){if(view==='quiz')quiz();else if(view==='result')results();else home()}
-$('#home').onclick=e=>{e.preventDefault();home()};$('#font').onclick=()=>{const isLarge=document.documentElement.classList.toggle('large');$('#font').setAttribute('aria-pressed',String(isLarge));$('#font').setAttribute('aria-label',isLarge?'Обычный размер текста':'Увеличить размер текста');$('#font').textContent=isLarge?'Аа−':'Аа+'};
+let state=null, view='home', selected=null, onlyErrors=false, reviewTopic='all', storageOk=true;
+try {
+  const p=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(p && p.version===VERSION && ['learn','exam'].includes(p.mode) && ['quiz','result'].includes(p.phase)
+    && Array.isArray(p.ids) && p.ids.length>0 && p.ids.length<=20 && new Set(p.ids).size===p.ids.length && p.ids.every(id=>byId(id))
+    && p.answers && typeof p.answers==='object' && Object.entries(p.answers).every(([id,v])=>p.ids.includes(Number(id)) && Number.isInteger(v) && v>=0 && v<byId(Number(id)).options.length)
+    && Number.isInteger(p.index) && p.index>=0 && p.index<p.ids.length && p.options
+    && p.ids.every(id=>Array.isArray(p.options[id]) && p.options[id].length===byId(id).options.length && new Set(p.options[id]).size===byId(id).options.length && p.options[id].every(v=>Number.isInteger(v) && v>=0 && v<byId(id).options.length))
+    && (p.deadline==null || (p.mode==='exam' && Number.isFinite(p.deadline) && Number.isFinite(p.startedAt) && p.deadline>p.startedAt && p.deadline-p.startedAt<=30*60000))
+    && (p.phase!=='result' || ['timeout','early'].includes(p.endReason) || p.ids.every(id=>p.answers[id]!==undefined))) state=p;
+} catch(e) {storageOk=false;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){storageOk=false;}}
+function say(t){$('#live').textContent=t;}
+function focusTitle(){const h=app.querySelector('[data-focus]');if(h){h.focus({preventScroll:true});h.scrollIntoView({block:'start',behavior:'auto'});}}
+function shuffled(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function refs(q){return q.refs.map(r=>`<a href="${LAW+SOURCES[r.a].path}" target="_blank" rel="noopener noreferrer">67-ФЗ, ст. ${r.a}${r.p==='статья полностью'?'':', '+esc(r.p)}</a>`).join(' · ');}
+function answerText(q,a){return a===undefined?'Нет ответа':q.options[a];}
+function timeText(seconds){return `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;}
+function remaining(){return state?.deadline?Math.max(0,Math.ceil((state.deadline-Date.now())/1000)):0;}
+function timerHtml(){return state?.phase==='quiz' && state.deadline?`<span class="timer" role="timer" aria-live="off" aria-label="Оставшееся время"><span>Осталось</span> <b id="time-left">${timeText(remaining())}</b></span>`:'';}
+function tick(){
+  if(!state || state.phase!=='quiz' || !state.deadline)return;
+  const left=remaining(), badge=$('#time-left');
+  if(left===0){finish('timeout');say('Время истекло. Тест завершён, ответы сохранены.');return;}
+  if(badge){badge.textContent=timeText(left);badge.parentElement.classList.toggle('time-low',left<=60);}
+  if(left<=60 && !state.minuteWarning){state.minuteWarning=true;save();say('До завершения теста осталась одна минута.');}
+}
+function guardTime(){if(state?.phase==='quiz' && state.deadline && Date.now()>=state.deadline){tick();return false;}return true;}
+function home(){
+  if(!guardTime())return;
+  view='home';onlyErrors=false;reviewTopic='all';
+  app.innerHTML=`<section class="hero"><div class="hero-copy"><h1>Ситуационные задания</h1><p>20 вопросов по избирательному праву. В каждом — один правильный ответ.</p><p class="scope-note">Рассматриваются бумажные бюллетени и общий порядок, установленный Федеральным законом № 67-ФЗ. Особые условия указаны в самих заданиях.</p></div><section class="setup" aria-labelledby="setup-title"><h2 id="setup-title">Параметры теста</h2><fieldset class="modes"><legend class="sr-only">Режим прохождения</legend><label class="mode"><input type="radio" name="mode" value="learn" checked><span><b>С пояснениями</b><small>Разбор после каждого ответа</small></span></label><label class="mode"><input type="radio" name="mode" value="exam"><span><b>Проверка знаний</b><small>Разбор после завершения</small></span></label></fieldset><label class="label" for="scope">Раздел</label><select id="scope" class="select"><option value="all">Все разделы · 20 вопросов</option>${MODULES.map((m,i)=>`<option value="${i}">${esc(m.name)} · 5 вопросов</option>`).join('')}</select><div id="timer-settings" class="timer-settings" hidden><label class="label" for="time-limit">Ограничение времени</label><select id="time-limit" class="select"><option value="0">Без ограничения</option><option value="5">5 минут</option><option value="10">10 минут</option><option value="20">20 минут</option><option value="30">30 минут</option></select><p class="small muted">При выходе к разделам и закрытии страницы отсчёт продолжается. По истечении времени сохраняется текущий результат.</p></div><label class="check"><input type="checkbox" id="shuffle" checked>Перемешать вопросы и ответы</label><button class="btn primary wide" id="start">Начать тест</button></section></section>${state?`<section class="resume"><div><p><b>${state.phase==='result'?'Сохраненный результат':'Незавершенная попытка'}</b><br><span class="small">${state.mode==='learn'?'С пояснениями':'Проверка знаний'} · ${Object.keys(state.answers).length} из ${state.ids.length}</span></p>${timerHtml()}</div><button class="btn small" id="resume">${state.phase==='result'?'Посмотреть результат':'Продолжить'}</button></section>`:''}<section aria-labelledby="topics-title"><div class="section-title"><h2 id="topics-title">Разделы</h2></div><div class="modules">${MODULES.map((m,i)=>`<article class="module"><span class="number">${String(i+1).padStart(2,'0')}</span><div><h3>${esc(m.name)}</h3><p>${esc(m.desc)}</p></div></article>`).join('')}</div></section><details class="how"><summary>Порядок прохождения</summary><div><p>За правильный ответ — один балл. В режиме с пояснениями ответ фиксируется после проверки. В режиме проверки знаний его можно изменить до завершения теста.</p><p>В проверке знаний можно включить таймер или завершить попытку досрочно. Вопросы без ответа не приносят баллов и отмечаются отдельно в результате.</p><p>Последняя попытка сохраняется в этом браузере, если доступно локальное хранилище. На странице результата можно повторить ошибки или отдельный раздел, распечатать разбор и сохранить его в текстовый файл.</p><p>На клавиатуре: 1–4 — выбрать ответ, Enter — проверить его или перейти дальше. Когда фокус стоит на кнопке или другом элементе управления, действуют обычные клавиши этого элемента.</p><p>Тест работает без интернета. Подключение требуется только для перехода к текстам закона. Если предпросмотр не запускает интерактивный режим, в файле доступна самопроверка с раскрывающимися ответами.</p></div></details>`;
+  app.querySelectorAll('input[name=mode]').forEach(r=>r.onchange=()=>{$('#timer-settings').hidden=$('input[name=mode]:checked').value!=='exam';});
+  $('#start').onclick=()=>{
+    const mode=$('input[name=mode]:checked').value, scope=$('#scope').value, mix=$('#shuffle').checked;
+    const minutes=mode==='exam'?Number($('#time-limit').value):0;
+    const ids=QUESTIONS.filter(q=>scope==='all'||q.m===Number(scope)).map(q=>q.id);
+    if(state && state.phase==='quiz' && !confirm('Начать новую попытку? Она заменит сохраненную незавершенную попытку.'))return;
+    start(ids,mode,mix,minutes);
+  };
+  if($('#resume'))$('#resume').onclick=()=>{if(!guardTime())return;view=state.phase;selected=null;render();focusTitle();};
+}
+function start(ids,mode='learn',mix=false,minutes=0){
+  const order=mix?shuffled(ids):[...ids], startedAt=Date.now();
+  const limit=mode==='exam' && [5,10,20,30].includes(minutes)?minutes:0;
+  state={version:VERSION,phase:'quiz',mode,ids:order,index:0,answers:{},startedAt,limitMinutes:limit,deadline:limit?startedAt+limit*60000:null,options:Object.fromEntries(order.map(id=>[id,mix?shuffled(byId(id).options.map((_,i)=>i)):byId(id).options.map((_,i)=>i)]))};
+  selected=null;onlyErrors=false;reviewTopic='all';view='quiz';save();render();focusTitle();
+}
+function quiz(){
+  if(!guardTime())return;
+  const q=byId(state.ids[state.index]), answer=state.answers[q.id], locked=state.mode==='learn' && answer!==undefined;
+  selected=answer===undefined?null:answer;
+  const done=Object.keys(state.answers).length, isLast=state.index===state.ids.length-1;
+  app.innerHTML=`<div class="quiz-top"><button class="btn ghost small" id="back-home">← К разделам</button><div class="quiz-status">${timerHtml()}<span class="pill">${state.mode==='learn'?'С пояснениями':'Проверка знаний'}</span></div></div><div class="quiz-layout"><section class="question-card"><div class="question-meta"><span>СИТУАЦИЯ ${state.index+1} ИЗ ${state.ids.length}</span><span>${esc(MODULES[q.m].name)}</span></div><div class="progress" id="answer-progress" role="progressbar" aria-label="Ответы сохранены" aria-valuenow="${done}" aria-valuemin="0" aria-valuemax="${state.ids.length}"><span style="width:${done/state.ids.length*100}%"></span></div><p class="eyebrow">${esc(q.title)}</p><h2 id="question-text" tabindex="-1" data-focus>${esc(q.q)}</h2><fieldset class="options" aria-labelledby="question-text"><legend class="sr-only">Выберите один ответ</legend>${state.options[q.id].map((opt,i)=>`<label class="option ${locked?'locked':''} ${locked && opt===q.correct?'right':''} ${locked && opt===answer && opt!==q.correct?'wrong':''}"><input type="radio" name="answer" value="${opt}" ${answer===opt?'checked':''} ${locked?'disabled':''}><span class="option-text"><span class="letter">${['А','Б','В','Г'][i]}.</span>${esc(q.options[opt])}${locked && opt===q.correct?'<span class="answer-tag">✓ Правильный ответ</span>':''}${locked && opt===answer && opt!==q.correct?'<span class="answer-tag">× Ваш ответ</span>':''}</span></label>`).join('')}</fieldset>${locked?`<div class="feedback ${answer===q.correct?'':'error'}"><h3>${answer===q.correct?'Верно':'Неверно'}</h3><p>${esc(q.explain)}</p><p class="legal">${refs(q)}</p></div>`:''}<div class="actions"><button class="btn" id="previous" ${state.index===0?'disabled':''}>← Назад</button><button class="btn primary" id="submit" ${selected===null?'disabled':''}>${state.mode==='learn' && !locked?'Проверить ответ':isLast?'Завершить тест':'Далее →'}</button></div><p class="keyboard-hint">Клавиатура: 1–4 — ответ, Enter — ${state.mode==='learn' && !locked?'проверить':'дальше'}.</p><div id="question-notice" class="notice" hidden></div></section><aside class="side"><h3>Вопросы</h3><div class="numbers" aria-label="Навигация по вопросам">${state.ids.map((id,i)=>`<button class="num ${state.answers[id]!==undefined?'done':''} ${state.index===i?'current':''}" data-index="${i}" ${state.index===i?'aria-current="step"':''} aria-label="Вопрос ${i+1}${state.answers[id]!==undefined?', ответ сохранен':''}">${i+1}</button>`).join('')}</div><p class="answer-count" id="answer-count">Отвечено: ${done} из ${state.ids.length}</p>${state.mode==='exam'?'<button class="btn small wide" id="finish-early">Завершить досрочно</button>':''}${!storageOk?'<p class="storage-note">В этом браузере сохранение между открытиями недоступно. Текущая попытка работает до закрытия страницы.</p>':''}</aside></div>`;
+  $('#back-home').onclick=home;
+  $('#previous').onclick=()=>move(state.index-1);
+  app.querySelectorAll('[data-index]').forEach(b=>b.onclick=()=>move(Number(b.dataset.index)));
+  app.querySelectorAll('input[name=answer]').forEach(r=>r.onchange=()=>{
+    if(!guardTime())return;
+    selected=Number(r.value);$('#submit').disabled=false;
+    if(state.mode==='exam'){
+      state.answers[q.id]=selected;save();
+      const count=Object.keys(state.answers).length;
+      $('#answer-count').textContent=`Отвечено: ${count} из ${state.ids.length}`;
+      $('#answer-progress').setAttribute('aria-valuenow',String(count));
+      $('#answer-progress span').style.width=`${count/state.ids.length*100}%`;
+      const number=app.querySelector(`[data-index="${state.index}"]`);
+      number.classList.add('done');number.setAttribute('aria-label',`Вопрос ${state.index+1}, ответ сохранен`);
+    }
+  });
+  $('#submit').onclick=()=>{
+    if(!guardTime() || selected===null)return;
+    if(state.mode==='learn' && !locked){
+      state.answers[q.id]=selected;save();quiz();
+      const feedback=app.querySelector('.feedback');feedback.setAttribute('tabindex','-1');feedback.focus({preventScroll:true});feedback.scrollIntoView({block:'nearest'});
+      say(selected===q.correct?'Верно':'Неверно');return;
+    }
+    state.answers[q.id]=selected;save();if(isLast)finish();else move(state.index+1);
+  };
+  if($('#finish-early'))$('#finish-early').onclick=()=>{
+    if(!guardTime())return;
+    const missing=state.ids.filter(id=>state.answers[id]===undefined).length;
+    if(!confirm(missing?`Завершить тест? Без ответа осталось вопросов: ${missing}. Они не принесут баллов.`:'Завершить тест и посмотреть результат?'))return;
+    finish('early');
+  };
+}
+function move(index){if(!guardTime())return;if(state.mode==='exam' && selected!==null)state.answers[state.ids[state.index]]=selected;state.index=index;save();quiz();focusTitle();}
+function finish(reason='complete'){
+  if(!state || state.phase!=='quiz')return;
+  if(reason!=='timeout' && !guardTime())return;
+  const missing=state.ids.findIndex(id=>state.answers[id]===undefined);
+  if(reason==='complete' && missing!==-1){move(missing);const n=$('#question-notice');n.hidden=false;n.textContent=state.mode==='exam'?'Остался вопрос без ответа. Ответьте на все вопросы или завершите проверку досрочно.':'Остался вопрос без ответа. Ответьте на все вопросы, чтобы получить итог.';say(n.textContent);return;}
+  state.phase='result';state.endReason=reason;state.finishedAt=Date.now();view='result';save();results();focusTitle();
+}
+function score(){return state.ids.filter(id=>state.answers[id]===byId(id).correct).length;}
+function results(){
+  view='result';
+  const right=score(), total=state.ids.length, percent=Math.round(right/total*100);
+  const missing=state.ids.filter(id=>state.answers[id]===undefined).length;
+  const wrong=state.ids.filter(id=>state.answers[id]!==byId(id).correct);
+  const stats=MODULES.map((m,i)=>{const ids=state.ids.filter(id=>byId(id).m===i);return {m,i,ids,right:ids.filter(id=>state.answers[id]===byId(id).correct).length};}).filter(s=>s.ids.length);
+  const repeat=stats.filter(s=>s.right<s.ids.length).sort((a,b)=>a.right/a.ids.length-b.right/b.ids.length);
+  const description=`Правильных ответов: ${right}. Ошибок: ${total-right-missing}.${missing?` Без ответа: ${missing}.`:''}`;
+  const completion=state.endReason==='timeout'?'Время истекло.':'Завершено досрочно.';
+  app.innerHTML=`<section class="result-header"><div><span class="eyebrow">${state.mode==='learn'?'С пояснениями':'Проверка знаний'}</span><h1 tabindex="-1" data-focus>Результат теста</h1><p>${description}</p>${['timeout','early'].includes(state.endReason)?`<p class="completion-note">${completion}</p>`:''}${state.limitMinutes?`<p class="completion-note">Ограничение: ${state.limitMinutes} мин.</p>`:''}</div><div class="score" aria-label="${right} правильных ответов из ${total}, ${percent} процентов"><strong>${right}/${total}</strong><span>${percent}% верных</span></div></section><div class="result-modules">${stats.map(s=>`<section class="result-module ${s.right<s.ids.length?'needs-review':''}"><h3>${esc(s.m.name)}</h3><strong>${s.right} / ${s.ids.length}</strong><div class="progress" role="progressbar" aria-label="${esc(s.m.name)}: правильных ответов" aria-valuemin="0" aria-valuemax="${s.ids.length}" aria-valuenow="${s.right}"><span style="width:${s.right/s.ids.length*100}%"></span></div><button class="btn small wide topic-retry" data-retry-topic="${s.i}">Повторить раздел<span class="sr-only">: ${esc(s.m.name)}</span></button></section>`).join('')}</div>${repeat.length?`<section class="repeat-plan" aria-labelledby="repeat-title"><h2 id="repeat-title">Что повторить</h2><p>В первую очередь — ${esc(repeat[0].m.name.toLocaleLowerCase('ru'))}: ${repeat[0].right} верных ответов из ${repeat[0].ids.length}.</p><p class="small muted">Кнопка «Повторить раздел» запускает все пять заданий по теме с пояснениями. «Повторить ошибки» — только неверные и пропущенные задания.</p></section>`:''}<div class="result-actions">${wrong.length?'<button class="btn primary" id="retry-errors">Повторить ошибки</button>':''}<button class="btn ${wrong.length?'':'primary'}" id="retry-all">Пройти еще раз</button><button class="btn" id="choose-route">Выбрать раздел</button><button class="btn" id="print">Печать разбора</button><button class="btn" id="download">Сохранить результат</button></div><section aria-labelledby="review-title"><div class="review-heading"><h2 id="review-title">Разбор ответов</h2><label class="check" style="margin:0"><input type="checkbox" id="errors-only" ${onlyErrors?'checked':''}>${missing?'Ошибки и пропуски':'Только ошибки'}</label></div><label class="label" for="review-topic">Раздел в разборе</label><select id="review-topic" class="select review-select"><option value="all">Все разделы</option>${stats.map(s=>`<option value="${s.i}" ${reviewTopic===String(s.i)?'selected':''}>${esc(s.m.name)}</option>`).join('')}</select><div id="reviews">${reviewHtml()}</div></section>`;
+  app.querySelectorAll('[data-retry-topic]').forEach(b=>b.onclick=()=>start(QUESTIONS.filter(q=>q.m===Number(b.dataset.retryTopic)).map(q=>q.id),'learn',true));
+  if($('#retry-errors'))$('#retry-errors').onclick=()=>start(wrong,'learn',false);
+  $('#retry-all').onclick=()=>start(state.ids,state.mode,false,state.limitMinutes||0);
+  $('#choose-route').onclick=home;
+  $('#errors-only').onchange=e=>{onlyErrors=e.target.checked;$('#reviews').innerHTML=reviewHtml();};
+  $('#review-topic').onchange=e=>{reviewTopic=e.target.value;$('#reviews').innerHTML=reviewHtml();};
+  $('#print').onclick=printResult;$('#download').onclick=downloadResult;
+}
+function reviewHtml(){
+  const ids=state.ids.filter(id=>(!onlyErrors || state.answers[id]!==byId(id).correct) && (reviewTopic==='all' || byId(id).m===Number(reviewTopic)));
+  if(!ids.length)return '<p class="notice">Нет заданий, соответствующих выбранному фильтру.</p>';
+  return ids.map(id=>{const q=byId(id), a=state.answers[id], ok=a===q.correct;
+    return `<details class="review ${ok?'':'fail'}"><summary><span class="review-icon" aria-label="${ok?'Верно':a===undefined?'Без ответа':'Ошибка'}">${ok?'✓':a===undefined?'—':'×'}</span><span>${state.ids.indexOf(id)+1}. ${esc(q.title)}</span></summary><div class="review-body"><p><b>${esc(q.q)}</b></p><p class="selected-answer">Ваш ответ: ${esc(answerText(q,a))}</p>${ok?'':`<p><b>Правильный ответ:</b> ${esc(q.options[q.correct])}</p>`}<p>${esc(q.explain)}</p><div class="legal">${refs(q)}</div></div></details>`;
+  }).join('');
+}
+function printResult(){
+  const right=score();
+  $('#print-area').innerHTML=`<h1>Первое голосование</h1><p>Результат: ${right} из ${state.ids.length} (${Math.round(right/state.ids.length*100)}%). Режим: ${state.mode==='learn'?'с пояснениями':'проверка знаний'}.</p><p>Правовая основа: Федеральный закон от 12.06.2002 № 67-ФЗ.</p>${state.ids.map((id,i)=>{const q=byId(id);return `<article><h2>${i+1}. ${esc(q.title)}</h2><p>${esc(q.q)}</p><p>Ваш ответ: ${esc(answerText(q,state.answers[id]))}</p><p><b>Правильный ответ:</b> ${esc(q.options[q.correct])}</p><p>${esc(q.explain)}</p><p>${refs(q)}</p></article>`;}).join('')}`;
+  window.print();
+}
+function downloadResult(){
+  const body=['ПЕРВОЕ ГОЛОСОВАНИЕ','Практикум по избирательному праву',`Результат: ${score()} из ${state.ids.length}`,`Режим: ${state.mode==='learn'?'с пояснениями':'проверка знаний'}`,'Правовая основа: Федеральный закон от 12.06.2002 № 67-ФЗ.','',...state.ids.flatMap((id,i)=>{const q=byId(id);return[`${i+1}. ${q.q}`,`Ваш ответ: ${answerText(q,state.answers[id])}`,`Правильный ответ: ${q.options[q.correct]}`,q.explain,...q.refs.map(r=>`67-ФЗ, ст. ${r.a}, ${r.p}. ${LAW+SOURCES[r.a].path}`),''];})].join('\r\n');
+  const url=URL.createObjectURL(new Blob(['\ufeff'+body],{type:'text/plain;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='Первое_голосование_результат.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function render(){if(view==='quiz')quiz();else if(view==='result')results();else home();}
+document.addEventListener('keydown',e=>{
+  if(view!=='quiz' || !state || state.phase!=='quiz' || e.repeat || e.ctrlKey || e.altKey || e.metaKey || $('#source-dialog').open)return;
+  const target=e.target;
+  if(target.closest('input,select,textarea,button,a,summary,[contenteditable="true"]'))return;
+  if(!guardTime())return;
+  if(/^[1-4]$/.test(e.key)){
+    const input=app.querySelectorAll('input[name=answer]')[Number(e.key)-1];
+    if(input && !input.disabled){e.preventDefault();input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}
+  }else if(e.key==='Enter' && !$('#submit').disabled){e.preventDefault();$('#submit').click();}
+});
+$('#home').onclick=e=>{e.preventDefault();home();};
+$('#font').onclick=()=>{const isLarge=document.documentElement.classList.toggle('large');$('#font').setAttribute('aria-pressed',String(isLarge));$('#font').setAttribute('aria-label',isLarge?'Обычный размер текста':'Увеличить размер текста');$('#font').textContent=isLarge?'Аа−':'Аа+';};
 $('#source-list').innerHTML=Object.entries(SOURCES).map(([a,s])=>`<li><a href="${LAW+s.path}" target="_blank" rel="noopener noreferrer">Статья ${a}. ${esc(s.name)}</a></li>`).join('');
-$('#sources').onclick=e=>{e.preventDefault();$('#source-dialog').showModal()};$('#close-sources').onclick=()=>$('#source-dialog').close();$('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
-home();
+$('#sources').onclick=e=>{e.preventDefault();$('#source-dialog').showModal();};
+$('#close-sources').onclick=()=>$('#source-dialog').close();
+$('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
+home();tick();
+setInterval(tick,1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick();});
 $('#font').hidden=false;
 </script>
 </body>
 </html>
+
