@@ -93,11 +93,74 @@ html{scrollbar-gutter:stable}
 .qr-trigger{flex:none;white-space:nowrap;font-size:.77rem!important;min-height:38px!important;padding:8px 13px!important}
 @media(max-width:480px){.footer .qr-trigger{margin-top:14px}#qr-dialog{padding:21px}}
 
+.top .a11y-toggle{font-size:.8rem;max-width:100%;white-space:normal}
+.a11y-panel{margin:22px 0;padding:18px 22px;border:1px solid var(--line);border-radius:18px;background:var(--paper)}
+.a11y-panel>summary{font-weight:750;font-size:1rem;padding:5px 0}
+.a11y-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:20px 0 14px}
+.a11y-settings fieldset{border:0;padding:0;margin:0;min-width:0}
+.a11y-settings legend{font-weight:700;margin-bottom:9px}
+.a11y-options{display:flex;flex-wrap:wrap;gap:9px}
+.a11y-choice{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-height:44px}
+.a11y-choice:has(input:checked){border-color:var(--teal);background:var(--pale)}
+.a11y-choice input{flex:none;margin:0;width:18px;height:18px}
+.a11y-settings .check{margin:10px 0}
+:root.a11y{font-size:var(--a11y-size,20px)!important;--bg:#fff;--paper:#fff;--ink:#111;--muted:#111;--line:#111;--teal:#111;--teal-dark:#111;--pale:#fff;--shadow:none}
+:root.a11y[data-a11y-palette="dark"]{--bg:#111;--paper:#111;--ink:#fff;--muted:#fff;--line:#fff;--teal:#fff;--teal-dark:#fff;--pale:#111}
+:root.a11y[data-a11y-palette="beige"]{--bg:#f5edce;--paper:#f5edce;--ink:#123554;--muted:#123554;--line:#123554;--teal:#123554;--teal-dark:#123554;--pale:#f5edce}
+.a11y body{background:var(--bg);color:var(--ink);line-height:var(--a11y-line,1.6)}
+.a11y body :is(p,h1,h2,h3,span,strong,b,label,li,a,summary,button,select,div,section,header,footer,nav,aside,fieldset,legend){color:var(--ink)!important;overflow-wrap:anywhere}
+.a11y :is(p,li,label,select,.option-text,.btn,.num,.pill,.small,.muted,.eyebrow,.question-meta,.scope-note,.section-title span,.hero-facts span,.module-count,.keyboard-hint,.answer-count,.review-body,.legal,.storage-note,.setup-note,.timer,.brand small,.mode small,.mode b,.module p,.footer,.qr-address,.a11y-settings legend,.numbers-legend){font-size:1rem!important;line-height:var(--a11y-line,1.6)!important;letter-spacing:.02em!important}
+.a11y h1{font-size:2rem!important;line-height:1.3!important;letter-spacing:0!important}
+.a11y h2{font-size:1.3rem!important;line-height:var(--a11y-line,1.6)!important;letter-spacing:0!important}
+.a11y h3{font-size:1.1rem!important;line-height:var(--a11y-line,1.6)!important}
+.a11y :is(.setup,.module,.question-card,.side,.feedback,.feedback.error,.review,.review-body .selected-answer,.result-header,.result-module,.resume,.how,.notice,.reader-note,dialog,.mode-settings,.mode,.pill,.timer,.letter,.repeat-plan,.advanced-outcome,.num,.option,.hero-kicker,.brand-mark,.module .number,.advanced-mark,.progress,.btn,.legend-right,.legend-wrong,.a11y-choice){background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important;box-shadow:none!important}
+.a11y .select{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important;min-width:0;max-width:100%}
+.a11y :is(.btn.primary,.num.done,.progress>span),.a11y .btn.primary *,.a11y .num.done *{background:var(--ink)!important;color:var(--paper)!important}
+.a11y :is(.mode:has(input:checked),.option:has(input:checked),.a11y-choice:has(input:checked)){outline:2px solid var(--ink);outline-offset:-5px}
+.a11y .num.current{outline:3px solid var(--ink);outline-offset:2px}
+.a11y .num.answer-wrong{border-style:double;border-width:3px}
+.a11y .score{border-color:var(--ink)}
+.a11y a{text-decoration:underline}
+.a11y input{accent-color:var(--ink)}
+.a11y :disabled{opacity:1!important;border-style:dashed!important}
+.a11y :is(button,a,input,select,summary):focus-visible{outline:3px solid var(--ink)!important;outline-offset:4px!important}
+.a11y .hero,.a11y .quiz-layout,.a11y .result-header{grid-template-columns:minmax(0,1fr)}
+.a11y .hero{gap:28px}
+.a11y .hero-copy>p,.a11y .hero-copy .scope-note{max-width:none}
+.a11y .modules,.a11y .result-modules{grid-template-columns:repeat(2,minmax(0,1fr))}
+.a11y .module{min-height:0}
+.a11y .module-count{margin-top:16px}
+.a11y .modes{grid-template-columns:minmax(0,1fr)}
+.a11y .mode input{width:22px;height:22px}
+.a11y .numbers{grid-template-columns:repeat(auto-fit,minmax(3rem,1fr));gap:.5rem}
+.a11y .num{min-height:3.25rem}
+.a11y .side .btn{max-width:none}
+.a11y .actions,.a11y .quiz-top,.a11y .resume,.a11y .section-title{flex-wrap:wrap}
+.a11y .section-title span{max-width:none;text-align:left}
+.a11y .top{flex-wrap:wrap;align-items:flex-start}
+.a11y .tools{flex-wrap:wrap;max-width:100%}
+.a11y .brand{font-size:1rem;max-width:100%}
+.a11y #font{display:none!important}
+.a11y dialog{max-width:960px;max-height:85vh}
+.a11y #qr-dialog{max-width:640px}
+.a11y .dialog-head{flex-wrap:wrap}
+.a11y .qr-code{background:#fff!important;max-width:100%}
+.a11y .btn,.a11y summary{min-height:44px}
+.a11y *,.a11y *:before,.a11y *:after{transition:none!important;animation:none!important}
+.a11y .btn:hover,.a11y .module:hover{transform:none!important}
+.a11y[data-a11y-images="hide"] :is(.ballot-art,.brand-mark,.module .number,.advanced-mark){display:none!important}
+@media(max-width:900px){.a11y .modules,.a11y .result-modules,.a11y-settings{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:720px){.top{flex-wrap:wrap}.top .tools{width:100%}.a11y-toggle{margin-left:auto}.a11y .tools{gap:12px}}
+@media(max-width:480px){.top .a11y-toggle{width:100%;margin-left:0}.a11y-panel{padding:16px}.a11y .setup,.a11y .question-card{padding:18px 14px}.a11y .actions .btn{width:100%}.a11y .hero-facts{grid-template-columns:minmax(0,1fr)}}
+
+@media print{:root.a11y{--bg:#fff!important;--paper:#fff!important;--ink:#000!important;--muted:#000!important;--line:#000!important;--teal:#000!important;--pale:#fff!important}.a11y body{background:#fff!important;color:#000!important}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top"><a class="brand" id="home" href="#app" aria-label="На главную"><span class="brand-mark" aria-hidden="true">✓</span><span>Первое голосование<small>правовой тренажер</small></span></a><nav class="tools" aria-label="Инструменты"><button class="btn ghost small" id="font" hidden aria-pressed="false" aria-label="Увеличить размер текста">Аа+</button><a class="btn ghost small" id="sources" href="#reading-sources">Источники</a></nav></header>
+<header class="top"><a class="brand" id="home" href="#app" aria-label="На главную"><span class="brand-mark" aria-hidden="true">✓</span><span>Первое голосование<small>правовой тренажер</small></span></a><nav class="tools" aria-label="Инструменты"><button class="btn ghost small" id="font" hidden aria-pressed="false" aria-label="Увеличить размер текста">Аа+</button><a class="btn ghost small" id="sources" href="#reading-sources">Источники</a><button class="btn ghost small a11y-toggle" id="a11y-toggle" hidden aria-pressed="false" aria-controls="a11y-panel">Версия для слабовидящих</button></nav></header>
+<details id="a11y-panel" class="a11y-panel" hidden open><summary>Настройки отображения</summary><div class="a11y-settings"><fieldset><legend>Размер текста</legend><div class="a11y-options"><label class="a11y-choice"><input type="radio" name="a11y-size" value="20" aria-label="20 пикселей">20</label><label class="a11y-choice"><input type="radio" name="a11y-size" value="24" aria-label="24 пикселя">24</label><label class="a11y-choice"><input type="radio" name="a11y-size" value="32" aria-label="32 пикселя">32</label></div></fieldset><fieldset><legend>Цвета</legend><div class="a11y-options"><label class="a11y-choice"><input type="radio" name="a11y-palette" value="light">Чёрный на белом</label><label class="a11y-choice"><input type="radio" name="a11y-palette" value="dark">Белый на чёрном</label><label class="a11y-choice"><input type="radio" name="a11y-palette" value="beige">Синий на бежевом</label></div></fieldset><div><label class="label" for="a11y-line">Межстрочный интервал</label><select class="select" id="a11y-line"><option value="1.6">Обычный</option><option value="2">Увеличенный</option><option value="2.4">Большой</option></select></div><label class="check"><input type="checkbox" id="a11y-images">Скрыть декоративные изображения</label></div><button class="btn small" id="a11y-reset">Сбросить настройки</button></details>
 <main id="app"><section class="reader-intro"><h1>Ситуационные задания</h1><p>20 базовых и 30 углублённых вопросов по избирательному праву. В каждом - один правильный ответ.</p><div class="reader-note"><p>Выберите вариант, затем раскройте ответ и пояснение. За верный ответ - один балл.</p><p>Автоматический подсчет доступен при открытии файла в браузере на компьютере.</p></div><details class="how reader-help"><summary>Условия заданий</summary><div><p>Рассматриваются бумажные бюллетени и общий порядок, установленный Федеральным законом № 67-ФЗ. Особые условия указаны в самих заданиях.</p></div></details></section><a class="btn small" href="#reading-advanced">30 углублённых вопросов</a><nav class="reading-nav" aria-label="Разделы"><a class="btn small" href="#reading-topic0">Списки избирателей</a><a class="btn small" href="#reading-topic1">Выдача бюллетеня</a><a class="btn small" href="#reading-topic2">Голосование вне помещения</a><a class="btn small" href="#reading-topic3">Подсчет и протокол</a></nav><section class="reading-topic" aria-labelledby="reading-topic0"><h2 id="reading-topic0">1. Списки избирателей</h2><article class="question-card reading-question" id="reading-q1"><div class="question-meta"><span>ВОПРОС 1 ИЗ 20</span><span>Списки избирателей</span></div><p class="eyebrow">Обращение перед закрытием</p><h3 id="reading-title1">В день голосования в 19:10 избиратель подал в участковую комиссию заявление: его фамилии нет в списке, хотя документы подтверждают место жительства на этом участке. Голосование заканчивается в 20:00. Когда комиссия должна проверить сведения и принять решение?</h3><fieldset class="options" aria-labelledby="reading-title1"><legend class="sr-only">Выберите один ответ</legend><label class="option" data-correct="false"><input type="radio" name="reading-q1" value="0"><span class="option-text"><span class="letter">А.</span>Не позднее 21:10: на проверку отводится два часа с момента обращения.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q1" value="1"><span class="option-text"><span class="letter">Б.</span>Не позднее 19:10 следующего дня: действует общий суточный срок.</span></label><label class="option" data-correct="true"><input type="radio" name="reading-q1" value="2"><span class="option-text"><span class="letter">В.</span>До окончания голосования в 20:00, даже если два часа еще не истекли.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q1" value="3"><span class="option-text"><span class="letter">Г.</span>В течение двух часов после передачи заявления в территориальную комиссию.</span></label></fieldset><details class="reading-answer"><summary>Ответ и пояснение</summary><div class="feedback"><p><b>Правильный ответ: В.</b> До окончания голосования в 20:00, даже если два часа еще не истекли.</p><p>В день голосования заявление рассматривается в течение двух часов, но этот срок ограничен моментом окончания голосования. Поэтому в данном случае решение нужно принять до 20:00. При отказе заявителю вручается заверенная копия решения с указанием причин.</p><p class="legal"><a href="https://www.consultant.ru/document/cons_doc_LAW_37119/1ec07ae488cc52f723de033cfb526070706083f0/" target="_blank" rel="noopener noreferrer">67-ФЗ, ст. 17, п. 16</a></p></div></details></article>
 <article class="question-card reading-question" id="reading-q2"><div class="question-meta"><span>ВОПРОС 2 ИЗ 20</span><span>Списки избирателей</span></div><p class="eyebrow">Обжалование отказа</p><h3 id="reading-title2">За два дня до голосования участковая комиссия отказала гражданину во включении в список избирателей. Он обратился с жалобой непосредственно в суд по месту нахождения комиссии. Какой порядок предусмотрен законом?</h3><fieldset class="options" aria-labelledby="reading-title2"><legend class="sr-only">Выберите один ответ</legend><label class="option" data-correct="true"><input type="radio" name="reading-q2" value="0"><span class="option-text"><span class="letter">А.</span>Суд рассматривает жалобу немедленно; предварительная жалоба в вышестоящую комиссию не требуется.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q2" value="1"><span class="option-text"><span class="letter">Б.</span>Суд рассматривает жалобу в течение трех дней независимо от близости дня голосования.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q2" value="2"><span class="option-text"><span class="letter">В.</span>Суд рассматривает жалобу только после отказа вышестоящей избирательной комиссии.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q2" value="3"><span class="option-text"><span class="letter">Г.</span>Суд рассматривает жалобу после голосования, поскольку список уже передан на участок.</span></label></fieldset><details class="reading-answer"><summary>Ответ и пояснение</summary><div class="feedback"><p><b>Правильный ответ: А.</b> Суд рассматривает жалобу немедленно; предварительная жалоба в вышестоящую комиссию не требуется.</p><p>Отказ во включении в список можно обжаловать в вышестоящую комиссию или непосредственно в суд по месту нахождения участковой комиссии. За три и менее дня до голосования, а также в день голосования такая жалоба рассматривается немедленно.</p><p class="legal"><a href="https://www.consultant.ru/document/cons_doc_LAW_37119/1ec07ae488cc52f723de033cfb526070706083f0/" target="_blank" rel="noopener noreferrer">67-ФЗ, ст. 17, п. 16</a></p></div></details></article>
 <article class="question-card reading-question" id="reading-q3"><div class="question-meta"><span>ВОПРОС 3 ИЗ 20</span><span>Списки избирателей</span></div><p class="eyebrow">Сообщение о переезде</p><h3 id="reading-title3">После подписания и заверения списка избирателей сосед сообщил комиссии, что включенный в список гражданин переехал. Других сведений и документов пока нет. Достаточно ли этого сообщения для исключения гражданина из списка?</h3><fieldset class="options" aria-labelledby="reading-title3"><legend class="sr-only">Выберите один ответ</legend><label class="option" data-correct="false"><input type="radio" name="reading-q3" value="0"><span class="option-text"><span class="letter">А.</span>Достаточно, если сосед подтвердит сообщение своей подписью и предъявит паспорт.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q3" value="1"><span class="option-text"><span class="letter">Б.</span>Достаточно, если сообщение поддержат не менее двух членов участковой комиссии.</span></label><label class="option" data-correct="false"><input type="radio" name="reading-q3" value="2"><span class="option-text"><span class="letter">В.</span>Достаточно, если в течение суток сам избиратель не опровергнет сообщение о переезде.</span></label><label class="option" data-correct="true"><input type="radio" name="reading-q3" value="3"><span class="option-text"><span class="letter">Г.</span>Недостаточно: сообщение нужно проверить, а исключение возможно на основании официальных документов.</span></label></fieldset><details class="reading-answer"><summary>Ответ и пояснение</summary><div class="feedback"><p><b>Правильный ответ: Г.</b> Недостаточно: сообщение нужно проверить, а исключение возможно на основании официальных документов.</p><p>Гражданин вправе сообщать об изменении сведений об избирателях. Однако после подписания и заверения списка исключение допускается только на основании официальных документов. В списке указываются причина и дата исключения; запись заверяет председатель участковой комиссии.</p><p class="legal"><a href="https://www.consultant.ru/document/cons_doc_LAW_37119/1ec07ae488cc52f723de033cfb526070706083f0/" target="_blank" rel="noopener noreferrer">67-ФЗ, ст. 17, п. 16</a></p></div></details></article>
@@ -1337,6 +1400,41 @@ $('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog
 $('#qr-share').onclick=e=>{e.preventDefault();$('#qr-dialog').showModal();};
 $('#close-qr').onclick=()=>$('#qr-dialog').close();
 $('#qr-dialog').addEventListener('click',e=>{if(e.target===$('#qr-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
+const A11Y_KEY='first-vote-accessibility-v1';
+const A11Y_DEFAULT={enabled:false,size:20,palette:'light',line:1.6,images:'show'};
+let accessibility={...A11Y_DEFAULT};
+function validAccessibility(p){
+  return {enabled:p?.enabled===true,size:[20,24,32].includes(p?.size)?p.size:20,palette:['light','dark','beige'].includes(p?.palette)?p.palette:'light',line:[1.6,2,2.4].includes(p?.line)?p.line:1.6,images:p?.images==='hide'?'hide':'show'};
+}
+function applyAccessibility(next,persist=true){
+  const wasEnabled=accessibility.enabled;
+  accessibility=validAccessibility(next);
+  const root=document.documentElement;
+  root.classList.toggle('a11y',accessibility.enabled);
+  root.dataset.a11yPalette=accessibility.palette;
+  root.dataset.a11yImages=accessibility.images;
+  root.style.setProperty('--a11y-size',accessibility.size+'px');
+  root.style.setProperty('--a11y-line',String(accessibility.line));
+  root.style.colorScheme=accessibility.enabled && accessibility.palette==='dark'?'dark':'light';
+  $('#a11y-toggle').setAttribute('aria-pressed',String(accessibility.enabled));
+  $('#a11y-toggle').textContent=accessibility.enabled?'Обычная версия':'Версия для слабовидящих';
+  $('#a11y-panel').hidden=!accessibility.enabled;
+  if(accessibility.enabled && !wasEnabled)$('#a11y-panel').open=true;
+  document.querySelectorAll('input[name=a11y-size]').forEach(r=>r.checked=Number(r.value)===accessibility.size);
+  document.querySelectorAll('input[name=a11y-palette]').forEach(r=>r.checked=r.value===accessibility.palette);
+  $('#a11y-line').value=String(accessibility.line);
+  $('#a11y-images').checked=accessibility.images==='hide';
+  if(persist){try{localStorage.setItem(A11Y_KEY,JSON.stringify(accessibility));}catch(e){}}
+}
+try{applyAccessibility(JSON.parse(localStorage.getItem(A11Y_KEY)||'null'),false);}catch(e){applyAccessibility(A11Y_DEFAULT,false);}
+$('#a11y-toggle').onclick=()=>{applyAccessibility({...accessibility,enabled:!accessibility.enabled});say(accessibility.enabled?'Версия для слабовидящих включена.':'Обычная версия включена.');};
+document.querySelectorAll('input[name=a11y-size]').forEach(r=>r.onchange=()=>applyAccessibility({...accessibility,size:Number(r.value)}));
+document.querySelectorAll('input[name=a11y-palette]').forEach(r=>r.onchange=()=>applyAccessibility({...accessibility,palette:r.value}));
+$('#a11y-line').onchange=()=>applyAccessibility({...accessibility,line:Number($('#a11y-line').value)});
+$('#a11y-images').onchange=()=>applyAccessibility({...accessibility,images:$('#a11y-images').checked?'hide':'show'});
+$('#a11y-reset').onclick=()=>applyAccessibility({...A11Y_DEFAULT,enabled:true});
+$('#a11y-toggle').hidden=false;
+
 home();tick();
 setInterval(tick,1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick();});
