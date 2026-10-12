@@ -1345,11 +1345,16 @@ async function sendReport(){
       body:JSON.stringify({_subject:`Первое голосование: замечание к заданию № ${q.id}`,_template:'table',_url:'https://mikouwa.github.io/pervoe-golosovanie/',_honey:'',question_id:q.id,topic:MODULES[q.m].name,report_type:kind,question:q.q,options:q.options.map((s,i)=>`${i+1}. ${s}`).join('\n'),message:comment})
     });
     const data=await response.json();
-    if(!response.ok || !(data.success===true || data.success==='true'))throw new Error('not accepted');
+    if(!response.ok || !(data.success===true || data.success==='true')){
+      const message=typeof data.message==='string'?data.message:'';
+      console.warn('FormSubmit: ответ сервиса',response.status,String(data.success),message.slice(0,400));
+      throw new Error(/activat|confirm.*email|verify.*email/i.test(message)?'activation required':'not accepted');
+    }
     const draft=reportDrafts.get(q.id)||{};reportDrafts.set(q.id,{...draft,sent:fingerprint});
     setReportDelivery(q.id,'Сообщение принято к отправке. Спасибо за замечание.');
   }catch(e){
-    setReportDelivery(q.id,e.name==='AbortError'?'Сервис не подтвердил отправку за 20 секунд. Сохраните сообщение или скопируйте; перед повторной отправкой проверьте соединение.':'Отправку подтвердить не удалось. Комментарий сохранён в открытой странице. Попробуйте позже или сохраните сообщение в файл.');
+    console.warn('FormSubmit: отправка не подтверждена',e.name,String(e.message).slice(0,300));
+    setReportDelivery(q.id,e.message==='activation required'?'Форма ожидает активации автором сайта. До подтверждения сообщение можно сохранить в файл.':e.name==='AbortError'?'Сервис не подтвердил отправку за 20 секунд. Сохраните сообщение или скопируйте; перед повторной отправкой проверьте соединение.':'Отправку подтвердить не удалось. Комментарий сохранён в открытой странице. Попробуйте позже или сохраните сообщение в файл.');
   }finally{clearTimeout(timeout);reportSending=false;updateReportSend();}
 }
 $('#report-form').onsubmit=e=>{e.preventDefault();sendReport();};
