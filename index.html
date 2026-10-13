@@ -177,6 +177,44 @@ dialog.motion-closing::backdrop{animation:ui-backdrop-out 140ms ease-in both}
 @media(max-width:720px){.practice-tools,.study-grid{grid-template-columns:minmax(0,1fr)}.quick-card,.history-card{padding:22px}.study-guide summary{padding:17px}.guide-body{padding:0 18px 18px}.question-extras{justify-content:flex-start}.history-compare{padding:14px}.history-entry summary{padding:14px}.history-table th,.history-table td{padding:10px 4px}}
 @media(max-width:480px){.practice-tools .btn{width:100%}.history-entry summary{flex-wrap:wrap}.history-score{font-size:1.05rem}.report-actions .btn{width:100%}.study-guide summary{font-size:.95rem}.history-table table{font-size:.76rem}}
 
+/* Glass surfaces are progressive enhancements; reading and answer states stay opaque. */
+:root:not(.a11y) body{background:radial-gradient(ellipse at 9% 7%,#dcd0ff 0,transparent 35%),radial-gradient(ellipse at 94% 20%,#d9efff 0,transparent 37%),radial-gradient(ellipse at 36% 67%,#ffeacb 0,transparent 36%),#f6f4fc}
+:root:not(.a11y) :is(.top,.setup,.side,.history-card,.study-guide,.how,.review,dialog){background:#ffffffed;border-color:#e0d8ee;box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #ddd4eb66,0 12px 34px #39255f0c}
+:root:not(.a11y) .top{border-radius:0 0 24px 24px;box-shadow:inset 0 -1px 0 #fff,0 10px 30px #39255f08}
+:root:not(.a11y) .btn{border-radius:20px;background:linear-gradient(155deg,#fff 0%,#f7f3fc 100%);border-color:#c9bfdb;box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #dcd1ed88,0 4px 12px #39255f0b;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
+:root:not(.a11y) .btn.primary{color:#fff;background:linear-gradient(150deg,#794ddb 0%,#6239ca 53%,#5630b4 100%);border-color:#6841c6;box-shadow:inset 0 1px 0 #ffffff7d,inset 0 -1px 0 #38207680,0 6px 17px #5e3db92b}
+:root:not(.a11y) .btn:hover:not(:disabled){border-color:#b6a3d4;box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #dcd1ed88,0 8px 20px #39255f15}
+:root:not(.a11y) .btn.primary:hover:not(:disabled){background:linear-gradient(150deg,#7042d0,#5730b5);box-shadow:inset 0 1px 0 #ffffff8c,0 8px 22px #5e3db93d}
+:root:not(.a11y) .btn:active:not(:disabled){transform:translateY(1px);box-shadow:inset 0 1px 4px #39255f14,0 2px 7px #39255f0d}
+:root:not(.a11y) .btn:disabled{box-shadow:none}
+:root:not(.a11y) .module{box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #ffffff77,0 8px 22px #39255f08;border-color:#ffffffd9}
+:root:not(.a11y) .module .number{box-shadow:inset 0 1px 0 #fff,0 3px 10px #39255f0d;border:1px solid #ffffffb3}
+:root:not(.a11y) .quick-card{background:linear-gradient(145deg,#fff8e9,#ffefcf);box-shadow:inset 0 1px 0 #fff,0 10px 26px #7957180c}
+:root:not(.a11y) dialog[open]{background:#fffffff5;border:1px solid #fff;box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #d9cee799,0 24px 80px #2111393d}
+:root:not(.a11y) .question-card{background:#fffffffa;box-shadow:inset 0 1px 0 #fff,0 12px 36px #39255f0b}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root:not(.a11y) :is(.top,.setup,.side,.history-card,.study-guide,.how,.review){background:linear-gradient(150deg,#ffffffd9,#ffffff9c);-webkit-backdrop-filter:blur(20px) saturate(145%);backdrop-filter:blur(20px) saturate(145%);border-color:#ffffffc9}
+  :root:not(.a11y) :is(.setup,.side,.history-card,.study-guide,.how,.review){box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #ffffff80,0 10px 32px #39255f10}
+  :root:not(.a11y) .btn:not(.primary){background:linear-gradient(155deg,#ffffffe0,#ffffffb0);-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border-color:#c6bbd6}
+  :root:not(.a11y) .btn:not(.primary):hover:not(:disabled){background:linear-gradient(155deg,#fff,#f6efffde)}
+  :root:not(.a11y) .module{background:linear-gradient(145deg,#ffffff40,#ffffff0a),color-mix(in srgb,var(--topic-bg) 82%,transparent);-webkit-backdrop-filter:blur(16px) saturate(135%);backdrop-filter:blur(16px) saturate(135%)}
+  :root:not(.a11y) .module .number{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  :root:not(.a11y) .quick-card{background:linear-gradient(145deg,#fff8e9d9,#ffefcfb8);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%)}
+  :root:not(.a11y) dialog[open]{background:linear-gradient(150deg,#ffffffed,#ffffffd6);-webkit-backdrop-filter:blur(30px) saturate(155%);backdrop-filter:blur(30px) saturate(155%)}
+  :root:not(.a11y) dialog::backdrop{-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+}
+@media(prefers-reduced-transparency:reduce){
+  :root:not(.a11y) :is(.top,.setup,.side,.history-card,.study-guide,.how,.review,dialog,.module,.module .number,.quick-card,.btn){-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  :root:not(.a11y) :is(.top,.setup,.side,.history-card,.study-guide,.how,.review,dialog,.btn:not(.primary)){background:#fff!important}
+  :root:not(.a11y) .module{background:var(--topic-bg)!important}
+  :root:not(.a11y) .quick-card{background:#fff3d8!important}
+  :root:not(.a11y) dialog::backdrop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+}
+@media(max-width:720px){:root:not(.a11y) .top{border-radius:0 0 20px 20px}:root:not(.a11y) :is(.setup,.side,.history-card,.study-guide,.how,.review){-webkit-backdrop-filter:blur(12px) saturate(130%);backdrop-filter:blur(12px) saturate(130%)}:root:not(.a11y) dialog[open]{-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%)}}
+.a11y :is(.top,.setup,.side,.history-card,.study-guide,.how,.review,dialog,.module,.module .number,.quick-card,.btn),.a11y dialog::backdrop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.a11y .top{background:var(--paper)!important;box-shadow:none!important}
+@media print{body{background:#fff!important}*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}}
+
 </style>
 </head>
 <body>
