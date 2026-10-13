@@ -158,9 +158,9 @@ html{scrollbar-gutter:stable}
 @keyframes ui-panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes ui-backdrop-in{from{background:#182c3200}to{background:#182c3277}}
 @keyframes ui-backdrop-out{from{background:#182c3277}to{background:#182c3200}}
-.mode-settings>div:not([hidden]){animation:ui-panel-in 160ms ease-out}
-dialog[open]::backdrop{animation:ui-backdrop-in 180ms ease-out both}
-dialog.motion-closing::backdrop{animation:ui-backdrop-out 140ms ease-in both}
+.mode-settings>div:not([hidden]){animation:ui-panel-in 280ms cubic-bezier(.22,1,.36,1)}
+dialog[open]::backdrop{animation:ui-backdrop-in 360ms cubic-bezier(.22,1,.36,1) both}
+dialog.motion-closing::backdrop{animation:ui-backdrop-out 280ms ease-in-out both}
 .a11y dialog::backdrop{animation:none!important}
 @media(prefers-reduced-motion:reduce){.mode-settings>div,dialog::backdrop{animation:none!important}}
 
@@ -257,6 +257,13 @@ dialog.motion-closing::backdrop{animation:ui-backdrop-out 140ms ease-in both}
 /* Prevent iOS Safari's rectangular tap overlay on interactive glass surfaces.
    Keyboard focus remains visible through the existing :focus-visible rules. */
 :where(summary,button,a,label,input,select){-webkit-tap-highlight-color:transparent}
+
+
+/* Move the glass shell without fading its backdrop-filter layer. */
+.dialog-content{min-width:0;max-width:100%}
+dialog.motion-opening .dialog-content,dialog.motion-closing .dialog-content{will-change:transform,opacity}
+@media(prefers-reduced-motion:reduce){.dialog-content{will-change:auto!important}}
+.a11y .dialog-content{will-change:auto!important}
 
 </style>
 </head>
@@ -1609,23 +1616,33 @@ function runMotion(node,frames,duration,done=()=>{}){
   cancelMotion(node);
   if(!motionAllowed()){done();return;}
   let animation;
-  try{animation=node.animate(frames,{duration,easing:'cubic-bezier(.2,.7,.2,1)'});}catch(e){done();return;}
+  try{animation=node.animate(frames,{duration,easing:'cubic-bezier(.22,1,.36,1)'});}catch(e){done();return;}
   const record={animation,done};runningMotion.set(node,record);
   const settle=()=>{if(runningMotion.get(node)!==record)return;runningMotion.delete(node);animation.onfinish=null;animation.oncancel=null;animation.cancel();done();};
   animation.onfinish=settle;animation.oncancel=settle;
 }
+for(const dialog of document.querySelectorAll('dialog')){
+  const content=document.createElement('div');content.className='dialog-content';
+  while(dialog.firstChild)content.appendChild(dialog.firstChild);
+  dialog.appendChild(content);
+}
 function openAnimatedDialog(dialog){
   if(dialog.open)return;
   dialog.showModal();
-  runMotion(dialog,[{opacity:0,transform:'translateY(8px) scale(.985)'},{opacity:1,transform:'none'}],180);
+  const content=dialog.querySelector('.dialog-content');
+  dialog.classList.add('motion-opening');
+  runMotion(dialog,[{transform:'translateY(16px) scale(.965)'},{transform:'none'}],360,()=>dialog.classList.remove('motion-opening'));
+  runMotion(content,[{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'none'}],320);
 }
 function closeAnimatedDialog(dialog){
   if(!dialog.open || dialog.classList.contains('motion-closing'))return;
-  const style=getComputedStyle(dialog),from={opacity:style.opacity,transform:style.transform};
-  dialog.classList.add('motion-closing');
-  runMotion(dialog,[from,{opacity:0,transform:'translateY(5px) scale(.985)'}],140,()=>{dialog.classList.remove('motion-closing');if(dialog.open)dialog.close();});
+  const content=dialog.querySelector('.dialog-content'),style=getComputedStyle(dialog),inner=getComputedStyle(content);
+  const from={transform:style.transform},innerFrom={opacity:inner.opacity,transform:inner.transform};
+  dialog.classList.remove('motion-opening');dialog.classList.add('motion-closing');
+  runMotion(content,[innerFrom,{opacity:0,transform:'translateY(3px)'}],280,()=>{if(dialog.classList.contains('motion-closing'))content.style.opacity='0';});
+  runMotion(dialog,[from,{transform:'translateY(10px) scale(.985)'}],280,()=>{cancelMotion(content);dialog.classList.remove('motion-closing');if(dialog.open)dialog.close();});
 }
-function revealFeedback(node){runMotion(node,[{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'none'}],180);}
+function revealFeedback(node){runMotion(node,[{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'none'}],280);}
 document.addEventListener('click',e=>{
   if(!(e.target instanceof Element))return;
   const summary=e.target.closest('summary');if(!summary || e.target.closest('a,button,input,select'))return;
@@ -1638,7 +1655,7 @@ document.addEventListener('click',e=>{
   details.open=false;const closed=details.getBoundingClientRect().height;
   details.open=true;const expanded=details.getBoundingClientRect().height;
   detailsTargets.set(details,target);details.style.height=start+'px';details.style.overflow='hidden';
-  runMotion(details,[{height:start+'px'},{height:(target?expanded:closed)+'px'}],200,()=>{details.open=target;details.style.height='';details.style.overflow='';detailsTargets.delete(details);});
+  runMotion(details,[{height:start+'px'},{height:(target?expanded:closed)+'px'}],target?360:300,()=>{details.open=target;details.style.height='';details.style.overflow='';detailsTargets.delete(details);});
 });
 if(motionPreference.addEventListener)motionPreference.addEventListener('change',()=>{if(motionPreference.matches)finishMotion();});
 else if(motionPreference.addListener)motionPreference.addListener(()=>{if(motionPreference.matches)finishMotion();});
@@ -1649,7 +1666,7 @@ $('#qr-share').onclick=e=>{e.preventDefault();openAnimatedDialog($('#qr-dialog')
 $('#close-qr').onclick=()=>closeAnimatedDialog($('#qr-dialog'));
 for(const dialog of [$('#source-dialog'),$('#qr-dialog'),$('#history-dialog'),$('#report-dialog')]){
   dialog.addEventListener('cancel',e=>{e.preventDefault();closeAnimatedDialog(dialog);});
-  dialog.addEventListener('close',()=>{cancelMotion(dialog);dialog.classList.remove('motion-closing');});
+  dialog.addEventListener('close',()=>{cancelMotion(dialog);const content=dialog.querySelector('.dialog-content');cancelMotion(content);content.style.opacity='';dialog.classList.remove('motion-opening','motion-closing');});
   dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeAnimatedDialog(dialog);}});
 }
 const A11Y_KEY='first-vote-accessibility-v1';
