@@ -1739,7 +1739,7 @@ rememberResult();// Native selects remain the source of values and the accessibl
 const selectMenus=new Set();let activeSelectMenu=null,selectMenuSerial=0;
 function enhanceSelectMenus(){
   for(const menu of selectMenus)if(!menu.source.isConnected){menu.observer.disconnect();selectMenus.delete(menu);if(activeSelectMenu===menu)activeSelectMenu=null;}
-  for(const source of document.querySelectorAll('select#scope.select:not([data-menu-ready])')){
+  for(const source of document.querySelectorAll('select:is(#scope,#time-limit).select:not([data-menu-ready])')){
     if(source.closest('#a11y-panel'))continue;
     source.dataset.menuReady='true';
     const wrap=document.createElement('div');wrap.className='select-menu';source.before(wrap);wrap.append(source);
@@ -1798,6 +1798,7 @@ function enhanceSelectMenus(){
 }
 document.addEventListener('pointerdown',e=>{if(activeSelectMenu && !activeSelectMenu.wrap.contains(e.target))activeSelectMenu.close();});
 document.addEventListener('focusin',e=>{if(activeSelectMenu && !activeSelectMenu.wrap.contains(e.target))activeSelectMenu.close(false);});
+document.addEventListener('change',e=>{if(e.target.matches('input[name="mode"]') && activeSelectMenu)activeSelectMenu.close(false);});
 const selectRootObserver=new MutationObserver(()=>{if(document.documentElement.classList.contains('a11y'))for(const menu of selectMenus)menu.close(false);enhanceSelectMenus();for(const menu of selectMenus){const custom=!document.documentElement.classList.contains('a11y');menu.source.setAttribute('aria-hidden',String(custom));menu.source.tabIndex=custom?-1:menu.tabIndex===null?0:Number(menu.tabIndex);menu.trigger.hidden=!custom;if(menu.label)menu.label.htmlFor=custom?menu.trigger.id:menu.source.id;}});
 selectRootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 new MutationObserver(enhanceSelectMenus).observe(document.body,{childList:true,subtree:true});
