@@ -267,6 +267,7 @@ dialog.motion-opening .dialog-content,dialog.motion-closing .dialog-content{will
 
 .select-menu{position:relative;min-width:0;width:100%;max-width:100%}
 .select-menu-source{position:absolute;inset:0;width:100%;opacity:0;pointer-events:none}
+:root:not(.a11y) .select-menu-source{visibility:hidden;opacity:0}
 .select-menu-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;cursor:pointer;color:var(--ink);font:inherit;font-size:.88rem}
 .select-menu-trigger::after{content:'';width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);flex:none;margin:0 4px 4px 0;transition:transform .25s}
 .select-menu.open .select-menu-trigger::after{transform:rotate(225deg);margin-bottom:0}
