@@ -253,6 +253,11 @@ dialog.motion-closing::backdrop{animation:ui-backdrop-out 140ms ease-in both}
 }
 @media print{.top{display:none!important}}
 
+
+/* Prevent iOS Safari's rectangular tap overlay on interactive glass surfaces.
+   Keyboard focus remains visible through the existing :focus-visible rules. */
+:where(summary,button,a,label,input,select){-webkit-tap-highlight-color:transparent}
+
 </style>
 </head>
 <body>
