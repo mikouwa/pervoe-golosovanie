@@ -265,6 +265,33 @@ dialog.motion-opening .dialog-content,dialog.motion-closing .dialog-content{will
 @media(prefers-reduced-motion:reduce){.dialog-content{will-change:auto!important}}
 .a11y .dialog-content{will-change:auto!important}
 
+.select-menu{position:relative;min-width:0;width:100%;max-width:100%}
+.select-menu-source{position:absolute;inset:0;width:100%;opacity:0;pointer-events:none}
+.select-menu-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;cursor:pointer;color:var(--ink);font:inherit;font-size:.88rem}
+.select-menu-trigger::after{content:'';width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);flex:none;margin:0 4px 4px 0;transition:transform .25s}
+.select-menu.open .select-menu-trigger::after{transform:rotate(225deg);margin-bottom:0}
+.select-menu.open{z-index:40}
+.select-menu-list{position:absolute;top:calc(100% + 8px);left:0;right:0;overflow:auto;overscroll-behavior:contain;padding:6px;border:1px solid #d4c7e8;border-radius:16px;background:#fcfaff;box-shadow:0 12px 32px #30204a26;z-index:60;transform-origin:top center}
+.select-menu.opens-up .select-menu-list{top:auto;bottom:calc(100% + 8px);transform-origin:bottom center}
+.select-menu-option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;min-height:44px;border-radius:10px;font-size:.88rem;line-height:1.4;cursor:pointer;color:var(--ink);overflow-wrap:anywhere}
+.select-menu-option:hover,.select-menu-option.active{background:#eee5ff;color:#4e2796}
+.select-menu-option[aria-selected="true"]{font-weight:700}
+.select-menu-option[aria-disabled="true"]{opacity:.5;cursor:default}
+.select-menu-trigger:focus-visible{outline:3px solid #ab6200;outline-offset:4px}
+.select-menu-trigger:disabled{opacity:.6;cursor:default}
+.review-select+.select-menu-list{font-size:inherit}
+.mode-settings .select-menu-list{min-width:100%}
+.a11y .select-menu-source{position:static;opacity:1;pointer-events:auto}
+.a11y .select-menu-trigger,.a11y .select-menu-list{display:none!important}
+@media(prefers-reduced-motion:reduce){.select-menu-trigger::after{transition:none}}
+@media(max-width:480px){.select-menu-option{font-size:.85rem;padding:12px 10px}.select-menu-list{border-radius:14px}.select-menu-trigger{font-size:.85rem}}
+
+
+.select-menu-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+
+.setup,.select-menu-trigger{min-width:0}
+
+.mode>span{min-width:0}.mode b,.mode small{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -1456,7 +1483,7 @@ function home(){
   if(!guardTime())return;
   view='home';onlyErrors=false;reviewTopic='all';
   app.innerHTML=`<section class="hero"><div class="hero-copy"><span class="hero-kicker">Практикум по избирательному праву</span><h1>Знаете, как<br><span class="accent">всё устроено?</span></h1><p>20 базовых и 30 углублённых ситуаций по избирательному праву. Выберите, как поступить, и сравните ответ с законом.</p><div class="hero-art"><svg class="ballot-art" viewBox="0 0 160 132" fill="none" aria-hidden="true"><path d="M21 59 81 44l61 20-58 18-63-23Z" fill="#cdb8f6" stroke="#6741bd" stroke-width="2.5" stroke-linejoin="round"/><path d="M21 59v47l63 21V82L21 59Z" fill="#b597ed" stroke="#6741bd" stroke-width="2.5" stroke-linejoin="round"/><path d="m84 82 58-18v46l-58 17V82Z" fill="#e4d4ff" stroke="#6741bd" stroke-width="2.5" stroke-linejoin="round"/><path d="m62 62 36 11" stroke="#6741bd" stroke-width="5" stroke-linecap="round"/><g transform="rotate(13 85 39)"><rect x="64" y="8" width="40" height="60" rx="5" fill="#fff" stroke="#6741bd" stroke-width="2.5"/><path d="m73 37 8 8 15-18" stroke="#6741bd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g><circle cx="24" cy="25" r="7" fill="#ffc76b"/><path d="m137 17 3 7 8 1-6 5 2 8-7-4-6 4 1-8-6-5 8-1 3-7Z" fill="#ffac84"/><path d="m5 78 7-2m135 49 7 3M35 8l3 6" stroke="#9572d4" stroke-width="3" stroke-linecap="round"/></svg><div class="hero-facts"><span><b>50</b> ситуаций</span><span><b>4</b> темы</span><span><b>3</b> режима</span></div></div><p class="scope-note">Рассматриваются бумажные бюллетени и общий порядок, установленный Федеральным законом № 67-ФЗ. Особые условия указаны в самих заданиях.</p></div><section class="setup" aria-labelledby="setup-title"><h2 id="setup-title">Начнём?</h2><fieldset class="modes"><legend class="sr-only">Режим прохождения</legend><label class="mode"><input type="radio" name="mode" value="learn" checked><span><b>С пояснениями</b><small>Разбор после каждого ответа</small></span></label><label class="mode"><input type="radio" name="mode" value="exam"><span><b>Проверка знаний</b><small>Разбор после завершения</small></span></label><label class="mode mode-advanced"><input type="radio" name="mode" value="advanced"><span><b>Углублённая проверка</b><small>30 новых вопросов · 30 минут · без возврата</small></span><span class="advanced-mark" aria-hidden="true">III</span></label></fieldset><label class="label" for="scope">Раздел</label><select id="scope" class="select"><option value="all">Все разделы · 20 вопросов</option>${MODULES.map((m,i)=>`<option value="${i}">${esc(m.name)} · 5 вопросов</option>`).join('')}</select><div class="mode-settings"><div id="learning-settings" class="learning-settings"><b>Порядок прохождения</b><p>После каждого ответа доступны пояснение и ссылка на норму закона. Можно вернуться к предыдущим вопросам и пройти выбранный раздел без ограничения времени.</p></div><div id="timer-settings" class="timer-settings" hidden><label class="label" for="time-limit">Ограничение времени</label><select id="time-limit" class="select"><option value="0">Без ограничения</option><option value="5">5 минут</option><option value="10">10 минут</option><option value="20">20 минут</option><option value="30">30 минут</option></select><p class="small muted">При выходе к разделам и закрытии страницы отсчёт продолжается. По истечении времени сохраняется текущий результат.</p></div><div class="advanced-rules" id="advanced-rules" hidden><b>Условия прохождения</b><p>Отдельный набор из 30 более сложных вопросов по четырём темам. Вопросы и ответы перемешаны, время - 30 минут. После перехода дальше ответ изменить нельзя. Учебный порог - 27 из 30. Пояснения доступны после завершения.</p></div></div><label class="check"><input type="checkbox" id="shuffle" checked>Перемешать вопросы и ответы</label><button class="btn primary wide" id="start">Начать тест</button></section></section>${state?`<section class="resume"><div><p><b>${state.phase==='result'?'Сохраненный результат':'Незавершенная попытка'}</b><br><span class="small">${attemptName()} · ${Object.keys(state.answers).length} из ${state.ids.length}</span></p>${timerHtml()}</div><button class="btn small" id="resume">${state.phase==='result'?'Посмотреть результат':'Продолжить'}</button></section>`:''}${practiceTools()}<section aria-labelledby="topics-title"><div class="section-title"><h2 id="topics-title">Что будем разбирать?</h2><span>4 темы</span></div><div class="modules">${MODULES.map((m,i)=>`<button type="button" class="module" data-topic="${i}" aria-label="Выбрать раздел: ${esc(m.name)}"><span class="number" aria-hidden="true">${topicIcon(i)}</span><div><h3>${esc(m.name)}</h3><p>${esc(m.desc)}</p></div><span class="module-count">5 вопросов <span aria-hidden="true">↗</span></span></button>`).join('')}</div></section>${guidesSection()}<details class="how"><summary>Порядок прохождения</summary><div><p>За правильный ответ - один балл. В режиме с пояснениями ответ фиксируется после проверки. В режиме проверки знаний его можно изменить до завершения теста.</p><p>В углублённой проверке - отдельный набор из 30 новых вопросов за 30 минут. Возврат к предыдущим вопросам недоступен, ответ фиксируется при переходе дальше. Учебный порог прохождения - 27 правильных ответов из 30.</p><p>В проверке знаний можно включить таймер или завершить попытку досрочно. Вопросы без ответа не приносят баллов и отмечаются отдельно в результате.</p><p>Текущая попытка и последние 30 завершённых результатов сохраняются в этом браузере, если доступно локальное хранилище. Быстрый тест содержит 10 случайных базовых заданий по четырём темам; пояснения открываются после завершения. На странице результата можно повторить ошибки или отдельный раздел, распечатать разбор и сохранить его в текстовый файл.</p><p>На клавиатуре: 1-4 - выбрать ответ, Enter - проверить его или перейти дальше. Когда фокус стоит на кнопке или другом элементе управления, действуют обычные клавиши этого элемента.</p><p>Тест работает без интернета. Подключение требуется только для перехода к текстам закона. Если предпросмотр не запускает интерактивный режим, в файле доступна самопроверка с раскрывающимися ответами.</p></div></details>`;
-  app.querySelectorAll('[data-topic]').forEach(b=>b.onclick=()=>{$('#scope').value=b.dataset.topic;$('#scope').focus({preventScroll:true});$('.setup').scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});});
+  app.querySelectorAll('[data-topic]').forEach(b=>b.onclick=()=>{$('#scope').value=b.dataset.topic;$('#scope').dispatchEvent(new Event('change',{bubbles:true}));const picker=$('.select-menu-trigger');(picker && !picker.hidden?picker:$('#scope')).focus({preventScroll:true});$('.setup').scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});});
   function setupMode(){
     const mode=$('input[name=mode]:checked').value, advanced=mode==='advanced';
     $('#learning-settings').hidden=mode!=='learn';$('#timer-settings').hidden=mode!=='exam';$('#advanced-rules').hidden=!advanced;
@@ -1707,7 +1734,76 @@ $('#a11y-images').onchange=()=>applyAccessibility({...accessibility,images:$('#a
 $('#a11y-reset').onclick=()=>applyAccessibility({...A11Y_DEFAULT,enabled:true});
 $('#a11y-toggle').hidden=false;
 
-rememberResult();home();tick();
+rememberResult();// Native selects remain the source of values and the accessible-mode fallback.
+const selectMenus=new Set();let activeSelectMenu=null,selectMenuSerial=0;
+function enhanceSelectMenus(){
+  for(const menu of selectMenus)if(!menu.source.isConnected){menu.observer.disconnect();selectMenus.delete(menu);if(activeSelectMenu===menu)activeSelectMenu=null;}
+  for(const source of document.querySelectorAll('select#scope.select:not([data-menu-ready])')){
+    if(source.closest('#a11y-panel'))continue;
+    source.dataset.menuReady='true';
+    const wrap=document.createElement('div');wrap.className='select-menu';source.before(wrap);wrap.append(source);
+    source.classList.add('select-menu-source');
+    const trigger=document.createElement('button');trigger.type='button';trigger.className='select select-menu-trigger';trigger.id=`select-menu-trigger-${++selectMenuSerial}`;trigger.setAttribute('role','combobox');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+    const list=document.createElement('div');list.className='select-menu-list';list.id=`select-menu-list-${selectMenuSerial}`;list.setAttribute('role','listbox');list.hidden=true;trigger.setAttribute('aria-controls',list.id);
+    wrap.append(trigger,list);
+    const label=source.id?document.querySelector(`label[for="${source.id}"]`):null,tabIndex=source.getAttribute('tabindex');
+    const menu={source,wrap,trigger,list,label,tabIndex,index:source.selectedIndex,open:false,animation:null,typeText:'',typedAt:0};selectMenus.add(menu);
+    function cancel(){if(menu.animation){menu.animation.onfinish=null;menu.animation.cancel();menu.animation=null;}}
+    function paint(){
+      const custom=!document.documentElement.classList.contains('a11y');
+      source.setAttribute('aria-hidden',String(custom));source.tabIndex=custom?-1:tabIndex===null?0:Number(tabIndex);trigger.hidden=!custom;
+      if(label)label.htmlFor=custom?trigger.id:source.id;
+      trigger.disabled=source.disabled;trigger.innerHTML=`<span class="select-menu-value">${esc(source.selectedOptions[0]?.textContent||'')}</span>`;
+      if(!custom || source.disabled)menu.close();
+      if(menu.open)options();
+    }
+    function options(){
+      list.innerHTML=[...source.options].map((o,i)=>`<div class="select-menu-option ${i===menu.index?'active':''}" role="option" id="${list.id}-${i}" data-option="${i}" aria-selected="${i===source.selectedIndex}" ${o.disabled?'aria-disabled="true"':''}>${esc(o.textContent)}${i===source.selectedIndex?'<span aria-hidden="true">✓</span>':''}</div>`).join('');
+      const current=list.children[menu.index];if(current){trigger.setAttribute('aria-activedescendant',current.id);if(current.offsetTop<list.scrollTop)list.scrollTop=current.offsetTop;else if(current.offsetTop+current.offsetHeight>list.scrollTop+list.clientHeight)list.scrollTop=current.offsetTop+current.offsetHeight-list.clientHeight;}
+    }
+    menu.close=(animate=true)=>{
+      if(!menu.open){if(!animate){cancel();list.hidden=true;}return;}menu.open=false;trigger.setAttribute('aria-expanded','false');trigger.removeAttribute('aria-activedescendant');wrap.classList.remove('open');if(activeSelectMenu===menu)activeSelectMenu=null;
+      cancel();
+      const done=()=>{list.hidden=true;menu.animation=null;};
+      if(animate && motionAllowed()){menu.animation=list.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-5px)'}],{duration:180,easing:'cubic-bezier(.4,0,.6,1)'});menu.animation.onfinish=done;}else done();
+    };
+    menu.show=()=>{
+      if(source.disabled || document.documentElement.classList.contains('a11y'))return;
+      if(activeSelectMenu && activeSelectMenu!==menu)activeSelectMenu.close(false);
+      cancel();menu.open=true;activeSelectMenu=menu;menu.index=source.selectedIndex;list.hidden=false;wrap.classList.add('open');trigger.setAttribute('aria-expanded','true');options();
+      const r=trigger.getBoundingClientRect(),below=innerHeight-r.bottom-18,above=r.top-18;
+      wrap.classList.toggle('opens-up',below<170 && above>below);list.style.maxHeight=Math.max(100,Math.min(280,below<170&&above>below?above:below))+'px';
+      if(motionAllowed()){menu.animation=list.animate([{opacity:0,transform:'translateY(-7px)'},{opacity:1,transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.22,1,.36,1)'});menu.animation.onfinish=()=>{menu.animation=null;};}
+    };
+    function commit(index){const option=source.options[index];if(!option || option.disabled)return;source.selectedIndex=index;source.dispatchEvent(new Event('input',{bubbles:true}));source.dispatchEvent(new Event('change',{bubbles:true}));paint();menu.close();trigger.focus({preventScroll:true});}
+    trigger.onclick=()=>menu.open?menu.close():menu.show();
+    list.onclick=e=>{const option=e.target.closest('[data-option]');if(option)commit(Number(option.dataset.option));};
+    trigger.onkeydown=e=>{
+      if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){
+        e.preventDefault();if(!menu.open){menu.show();return;}
+        const step=e.key==='ArrowUp'?-1:1;let index=e.key==='Home'?0:e.key==='End'?source.options.length-1:Math.max(0,Math.min(source.options.length-1,menu.index+step));
+        while(source.options[index]?.disabled && index>=0 && index<source.options.length)index+=step;
+        if(source.options[index])menu.index=index;options();
+      }else if(e.key==='Enter' || e.key===' '){e.preventDefault();menu.open?commit(menu.index):menu.show();}
+      else if(e.key==='Escape'){if(menu.open){e.preventDefault();e.stopPropagation();menu.close();}}
+      else if(e.key==='Tab')menu.close(false);
+      else if(e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){
+        e.preventDefault();if(!menu.open)menu.show();const now=Date.now();menu.typeText=now-menu.typedAt>700?e.key:menu.typeText+e.key;menu.typedAt=now;
+        const index=[...source.options].findIndex(o=>!o.disabled && o.textContent.trim().toLocaleLowerCase('ru').startsWith(menu.typeText.toLocaleLowerCase('ru')));if(index!==-1){menu.index=index;options();}
+      }
+    };
+    source.addEventListener('change',paint);menu.observer=new MutationObserver(paint);menu.observer.observe(source,{attributes:true,attributeFilter:['disabled'],childList:true,subtree:true,characterData:true});paint();
+  }
+}
+document.addEventListener('pointerdown',e=>{if(activeSelectMenu && !activeSelectMenu.wrap.contains(e.target))activeSelectMenu.close();});
+document.addEventListener('focusin',e=>{if(activeSelectMenu && !activeSelectMenu.wrap.contains(e.target))activeSelectMenu.close(false);});
+const selectRootObserver=new MutationObserver(()=>{if(document.documentElement.classList.contains('a11y'))for(const menu of selectMenus)menu.close(false);enhanceSelectMenus();for(const menu of selectMenus){const custom=!document.documentElement.classList.contains('a11y');menu.source.setAttribute('aria-hidden',String(custom));menu.source.tabIndex=custom?-1:menu.tabIndex===null?0:Number(menu.tabIndex);menu.trigger.hidden=!custom;if(menu.label)menu.label.htmlFor=custom?menu.trigger.id:menu.source.id;}});
+selectRootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+new MutationObserver(enhanceSelectMenus).observe(document.body,{childList:true,subtree:true});
+if(motionPreference.addEventListener)motionPreference.addEventListener('change',()=>{if(motionPreference.matches)for(const menu of selectMenus)menu.close(false);});
+enhanceSelectMenus();
+
+home();tick();
 setInterval(tick,1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick();});
 $('#font').hidden=false;
