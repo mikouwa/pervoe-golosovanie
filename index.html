@@ -271,8 +271,8 @@ dialog.motion-opening .dialog-content,dialog.motion-closing .dialog-content{will
 .page-nav a{display:inline-flex;align-items:center;min-height:40px;padding:8px 14px;border:1px solid #cdbde48c;border-radius:999px;background:#ffffff85;color:#5e3e95;text-decoration:none;font-size:.8rem;font-weight:650;transition:background .2s,border-color .2s}
 .page-nav a:hover{background:#f3ebff;border-color:#ab91d2}
 :is(#setup-title,#topics-title,#study-title,#demo-title,#glossary-title){scroll-margin-top:130px}
-.welcome-tools{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;margin:34px 0}
-.demo-card,.glossary-card{min-width:0;padding:25px;border:1px solid #fff;border-radius:24px;background:linear-gradient(140deg,#ffffffbf,#f6f0ffc2);box-shadow:inset 0 1px 0 #fff,0 10px 30px #3b275409}
+.welcome-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:34px 0}
+.demo-card,.glossary-card{min-width:0;padding:23px;border:1px solid #fff;border-radius:24px;background:linear-gradient(140deg,#ffffffbf,#f6f0ffc2);box-shadow:inset 0 1px 0 #fff,0 10px 30px #3b275409}
 .welcome-tools h2{font-size:1.45rem;margin:9px 0 16px;letter-spacing:-.03em}
 .demo-question{font-size:.9rem;line-height:1.65}
 .demo-choices{display:grid;gap:9px}
@@ -304,7 +304,7 @@ dialog.motion-opening .dialog-content,dialog.motion-closing .dialog-content{will
 .a11y :is(.demo-correct,.demo-wrong) .demo-letter{font-size:0}
 .a11y :is(.demo-correct,.demo-wrong) .demo-letter:after{font-size:1.3rem}
 .a11y .welcome-tools{grid-template-columns:minmax(0,1fr)}
-@media(max-width:720px){.welcome-tools{grid-template-columns:minmax(0,1fr)}.demo-card,.glossary-card{padding:22px}.page-nav{margin-top:18px}.page-nav a{padding:8px 12px}}
+@media(max-width:720px){.welcome-tools{grid-template-columns:minmax(0,1fr)}.demo-card,.glossary-card{padding:23px}.page-nav{margin-top:18px}.page-nav a{padding:8px 12px}}
 @media(max-width:480px){.demo-card,.glossary-card{padding:20px}.welcome-tools h2{font-size:1.3rem}.demo-actions .btn{width:100%}.page-nav a{font-size:.76rem}}
 @media(prefers-reduced-motion:reduce){.page-nav a,.demo-choice{transition:none}}
 
